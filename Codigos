@@ -1,21 +1,128 @@
 1----------------------------------------------------------------------------------------------------------------------------------------------------------------
+#include <stdio.h>
+#include <stdlib.h>
 
+typedef struct Node {
+    int data;
+    struct Node* prev;
+    struct Node* next;
+} Node;
 
+// Função para inserir um número na lista em ordem crescente
+void insertInOrder(Node** head, int num) {
+    
+    // Criar um novo nó
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    newNode->data = num;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+   
+    // Se a lista estiver vazia, o novo nó se torna o primeiro nó
+    if (*head == NULL) {
+        *head = newNode;
+        return;
+    }
+   
+    // Se o número for menor que o primeiro nó, o novo nó se torna o novo primeiro nó
+    if (num < (*head)->data) {
+        newNode->next = *head;
+        (*head)->prev = newNode;
+        *head = newNode;
+        return;
+    }
+    
+    // Encontrar a posição correta na lista para inserir o novo nó
+    Node* current = *head;
+    while (current->next != NULL && num >= current->next->data) {
+        current = current->next;
+    }
+    
+    // Inserir o novo nó na posição correta
+    newNode->next = current->next;
+    newNode->prev = current;
+    if (current->next != NULL) {
+        current->next->prev = newNode;
+    }
+    current->next = newNode;
+}
+// Função para remover os números primos da lista
+void removePrimes(Node** head) {
+    Node* current = *head;
+    Node* nextNode;
+    while (current != NULL) {
+        nextNode = current->next;
 
+        // Verificar se o número é primo
+        int isPrime = 1;
+        for (int i = 2; i <= current->data / 2; i++) {
+            if (current->data % i == 0) {
+                isPrime = 0;
+                break;
+            }
+        }
 
+        // Remover o número primo da lista
+        if (isPrime) {
+            if (current->prev != NULL) {
+                current->prev->next = current->next;
+            } else {
+                *head = current->next;
+            }
+            if (current->next != NULL) {
+                current->next->prev = current->prev;
+            }
+            free(current);
+        }
 
+        current = nextNode;
+    }
+}
 
+// Função para imprimir a lista em ordem crescente e decrescente
+void printList(Node* head) {
+    printf("Lista crescente: ");
+    Node* current = head;
+    while (current != NULL) {
+        printf("%d ", current->data);
+        current = current->next;
+    }
+    printf("\n");
 
+    printf("Lista decrescente: ");
+    current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+    while (current != NULL) {
+        printf("%d ", current->data);
+        current = current->prev;
+    }
+    printf("\n");
+}
 
+int main() {
+    int vetor[1000];
+    Node* lista = NULL;
 
+    // Gerar números aleatórios e armazená-los no vetor
+    for (int i = 0; i < 1000; i++) {
+        vetor[i] = rand() % 19999 - 9999;
+    }
 
+    // Inserir números na lista em ordem crescente
+    for (int i = 0; i < 1000; i++) {
+        insertInOrder(&lista, vetor[i]);
+    }
 
+    // Imprimir lista em ordem crescente e decrescente
+    printList(lista);
 
+    // Remover números primos da lista
+    removePrimes(&lista);
 
+    // Imprimir lista após a remoção dos números primos
+    printList(lista);
 
-
-
-
-
-
+    return 0;
+}
 2---------------------------------------------------------------------------------------------------------------------------------------------------------------------
